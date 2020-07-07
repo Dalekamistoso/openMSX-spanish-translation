@@ -31,10 +31,12 @@ variable current_fade_delay_active
 variable current_fade_delay_non_active
 variable fade_id
 
+# temporary hack: for now map the new 'fastforward' setting onto the old 'throttle' setting
 proc trace_icon_status {name1 name2 op} {
 	variable last_change
 	global $name1
 	set icon [string trimleft $name1 ":"]
+	if {$icon eq "fastforward"} {set icon "throttle"}
 	set now [openmsx_info realtime]
 	set last_change($icon) $now
 	redraw_osd_icons $icon $now
@@ -48,7 +50,15 @@ proc redraw_osd_icons {icon now} {
 	global $icon
 
 	# handle 'unset' variables  (when current msx machine got deleted)
-	if {[catch {set value [set $icon]}]} {set value false}
+	if {[catch {
+		if {$icon eq "throttle"} {
+			set value [expr {$::throttle && !$::fastforward}]
+		} else {
+			set value [set $icon]
+		}
+	}]} {
+		set value false
+	}
 
 	if {$value} {
 		set widget  osd_icons.${icon}_on
@@ -292,6 +302,8 @@ proc machine_switch_osd_icons {} {
 		trace add    variable ::$icon "write unset" [namespace code trace_icon_status]
 		redraw_osd_icons $icon $now
 	}
+	trace remove variable ::fastforward "write unset" [namespace code trace_icon_status]
+	trace add    variable ::fastforward "write unset" [namespace code trace_icon_status]
 	after machine_switch [namespace code machine_switch_osd_icons]
 }
 
@@ -309,6 +321,7 @@ foreach icon $icon_list {
 	trace add variable ::$icon "write unset" load_icons::trace_icon_status
 	set last_change($icon) $now
 }
+trace add variable ::fastforward "write unset" load_icons::trace_icon_status
 
 namespace export load_icons
 
@@ -316,7 +329,7 @@ namespace export load_icons
 
 namespace import load_icons::*
 
-# Restore settings from previous session (he cambiado el iconset de set1 a set5)
+# Restore settings from previous session (He cambiado el set de iconos set1 a set5)
 # default is set1, but if only scale_factor 1 is supported, use handheld
 if {[lindex [openmsx_info setting scale_factor] 2 1] == 1} {
 	user_setting create string osd_leds_set "Name of the OSD icon set" "handheld"

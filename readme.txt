@@ -147,3 +147,5 @@ BETA 004 Only official versions supported (05/14/2020)
 
 BETA 005 Only official versions supported (06/11/2020)		 
          Added recent changes in openMSX prior 0.16
+
+BETA 006 Added changes in load icons script to match new changes in current compiled builds (07/07/2020)

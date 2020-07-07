@@ -149,5 +149,5 @@ BETA 005 Válida a partir de la build 0.15.0-848-g4dbe0355f (oficial solamente de
 
          Añadidos cambios en el fuente incluidos en esta build (pre openMSX 0.16)
 		 
-  
+BETA 006 Se añaden los cambios en script de iconos de acuerdo a las nuevas builds (07/07/2020)  
         
