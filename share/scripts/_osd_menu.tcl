@@ -749,10 +749,13 @@ set misc_setting_menu {
 	         font-size 10
 	         post-spacing 6
 	         selectable false }
-	       { textexpr "Velocidad: $speed"
+	       { textexpr "Velocidad: ${speed}%"		   
 	         actions { LEFT  { osd_menu::menu_setting [incr speed -1] }
 	                   RIGHT { osd_menu::menu_setting [incr speed  1] }}}
-	       { textexpr "Salto de fotogramas minimo: $minframeskip"
+	       { textexpr "Velocidad de aceleracion: ${fastforwardspeed}%"
+	         actions { LEFT  { osd_menu::menu_setting [incr fastforwardspeed -1] }
+	                   RIGHT { osd_menu::menu_setting [incr fastforwardspeed  1] }}}
+		   { textexpr "Salto de fotogramas minimo: $minframeskip"
 	         actions { LEFT  { osd_menu::menu_setting [incr minframeskip -1] }
 	                   RIGHT { osd_menu::menu_setting [incr minframeskip  1] }}}
 	       { textexpr "Salto de fotogramas maximo: $maxframeskip"
@@ -1664,7 +1667,7 @@ proc menu_select_disk {drive item {dummy false}} {
 		osd::display_message "Disco $cur_image expulsado de unidad [get_slot_str $drive]!"
 	} else {
 		# if the item is already a directory, it's an absolute path, use that as fullname
-		if {[file isdirectory $item] && $item ne "." && $item ne ".."} {
+		if {[file isdirectory $item] && $item ne "." && $item ne ".." && $item ni [file volumes]} {
 			set fullname $item
 			set abspath true
 		} else {
