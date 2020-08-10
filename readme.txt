@@ -151,4 +151,6 @@ BETA 005 Only official versions supported (06/11/2020)
 BETA 006 Added changes in load icons script to match new changes in current compiled builds (07/07/2020)
 
 BETA 007 Added new changes in scripts  to match new changes in current compiled builds also I forgot to add a 
-         little fix that I missed to add
+         little fix that I missed to add (07/11/2020)
+
+BETA 008 Added new changes in scripts  to match new changes in current compiled builds (08/11/2020)

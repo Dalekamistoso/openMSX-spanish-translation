@@ -742,7 +742,7 @@ proc create_main_menu {} {
 set misc_setting_menu {
 	font-size 8
 	border-size 2
-	width 150
+	width 180
 	xpos 100
 	ypos 120
 	items {{ text "Otros ajustes"
@@ -760,7 +760,11 @@ set misc_setting_menu {
 	                   RIGHT { osd_menu::menu_setting [incr minframeskip  1] }}}
 	       { textexpr "Salto de fotogramas maximo: $maxframeskip"
 	         actions { LEFT  { osd_menu::menu_setting [incr maxframeskip -1] }
-	                   RIGHT { osd_menu::menu_setting [incr maxframeskip  1] }}}}}
+	                   RIGHT { osd_menu::menu_setting [incr maxframeskip  1] }}}
+	       { textexpr "Modo de asignacion de teclado: $kbd_mapping_mode"
+	         actions { LEFT  { osd_menu::menu_setting [cycle_back kbd_mapping_mode] }
+	                   RIGHT { osd_menu::menu_setting [cycle      kbd_mapping_mode] }}}
+              }}
 
 set resampler_desc [dict create fast "Rapido (baja calidad)" blip "Medio (mas calidad)" hq "HQ (mejor calidad/lento)"]
 
