@@ -153,4 +153,6 @@ BETA 006 Added changes in load icons script to match new changes in current comp
 BETA 007 Added new changes in scripts  to match new changes in current compiled builds also I forgot to add a 
          little fix that I missed to add (07/11/2020)
 
-BETA 008 Added new changes in scripts  to match new changes in current compiled builds (08/11/2020)
+BETA 008 Added new changes in scripts to match new changes in current compiled builds (09/25/2020)
+
+BETA 009 Added new changes in scripts to match new changes in current compiled builds (09/25/2020)

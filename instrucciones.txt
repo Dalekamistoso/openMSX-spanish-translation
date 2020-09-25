@@ -154,3 +154,5 @@ BETA 006 Se añaden los cambios en script de iconos de acuerdo a las nuevas build
 BETA 007 Cambios en scripts para reflejar cambios nuevos y un pequeño fix que se me olvidó añadir a la declaración de velocidad (11/07/2020)
 
 BETA 008 Añadidos cambios para adaptarse a la última build (cambio de modo de mapeo de teclado) (11/08/2020)
+
+BETA 008 Añadidos cambios para adaptarse a la última build (25/09/2020)
