@@ -4,9 +4,6 @@
 variable is_dingux [string match dingux "[openmsx_info platform]"]
 variable is_android [string match android "[openmsx_info platform]"]
 
-# Insertar poke universal (atajo boton de firmware obsoleto) (DrWh0)
-bind_default MENU+SHIFT "type_from_file poke.txt" 
-
 # cycle_machine
 bind_default CTRL+PAGEUP cycle_machine
 bind_default CTRL+PAGEDOWN cycle_back_machine
@@ -81,3 +78,15 @@ if {$tcl_platform(os) eq "Darwin"} { ;# Mac
 	bind_default "keyb META+CTRL+V" "$my_type_command"
 }
 unset my_type_command
+
+# POKE UNIVERSAL
+bind_default ALT+F11 "type_from_file poke.txt"
+
+# MENU PARA TECLADOS SIN TECLA MENU
+bind_default ALT+F12 main_menu_toggle
+
+# TEST DE MAQUINAS PRESENTES
+bind_default ALT+SHIFT+F1 test_all_machines
+
+# TEST DE EXTENSIONES PRESENTES
+bind_default ALT+SHIFT+F2 test_all_extensions 

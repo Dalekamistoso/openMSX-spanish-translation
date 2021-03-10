@@ -27,7 +27,7 @@ proc getlist_rom_info {{romdevice ""}} {
 	}
 
 	if {[catch {set device_info [machine_info device $romdevice]}]} {
-		error "No existe como tal dispositivo: $romdevice"
+		error "No hay tal dispositivo: $romdevice"
 	}
 
 	set device_type [dict get $device_info "type"]
@@ -80,13 +80,13 @@ proc getlist_rom_info {{romdevice ""}} {
 			if {[info exists orig_type]} {
 				switch $orig_type {
 					"broken" {
-						set status "Volcado defectuoso (juego roto)""
+						set status "Volcado defectuoso (juego roto)"
 					}
 					"translated" {
 						set status "Traducido del original"
 					}
 					"working" {
-						set status "Modificado pero se confirma que funciona"
+						set status "Modificado pero se confirma que funciona bien"
 					}
 				}
 			}
@@ -97,7 +97,7 @@ proc getlist_rom_info {{romdevice ""}} {
 		if {$status ne ""} {
 			set statusPrefix " "
 		}
-		set status "$status${statusPrefix}(but patched by openMSX)"
+		set status "$status${statusPrefix}(pero parcheado por openMSX)"
 	}
 
 	return [list \

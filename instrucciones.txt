@@ -8,40 +8,35 @@ modificaciones PROVISIONALES de openMSX (consideralas de calidad beta) que mejor
 siguientes características:
 
 1.- Traducción de casi todas las funciones básicas del OSD interno a español
-2.- Añadidas opciones al GUI para activar/desactivar el interruptor de firmware interno 
-3.- Traducción de las "Toys" y herramientas más importantes
-4.- Filtro TSX para el uso SOLO con la versión modificada TSX Advanced de imulilla
-5.- Añadidos 2 atajos SHIFT+MENU y CTRL+MENU para activar/desactivar el botón de firmware interno
-6.- Compatible con MAC/Dingux/Linux/Raspberry/Windows (build 11/06/2020)
-7.- Cambiado el juego de iconos predeterminados del emulador al set 5 (mejora estética)
-8.- Cambiados los colores del menú interno
-9.- Cambiado texto inicial del botón de menú (superior izquierda)
+2.- Traducidos los scripts adicionales mas importantes que no dependan del .exe
+3.- Filtro adicional para TSX (SOLO FUNCIONAL con la versión modificada TSXAdvanced de imulilla)
+4.- Añadidos 4 atajos de teclado adicionales: 
+     * ALT+F11 Para teclear en la maquina virtual el poke universal de compatibilidad para MSX
+     * ALT+F12 Como atajo extra para acceder al OSD (ideal para teclados compactos y Pi400)
+     * ALT+SHIFT+F1 Verifica las roms de tus máquinas (pulsa F10 y tendrás el resultado en la consola)
+     * ALT+SHIFT+F2 Verifica las roms de tus extensiones (pulsa F10 y tendrás el resultado en la consola)
+5.- Compatible con MAC/Dingux/Linux/Raspberry/Windows (build 09/03/2021)
+6.- Cambiados los colores del menú interno
+7.- Cambiado texto y aspecto del botón de menú OSD
+8.- Compatible tanto en plataformas de 32 como 64 bits (los ficheros son los mismos)
+9.- Añadido script para modo 100% portable en Windows
 
-Pendiente de hacer (para cuando salga la nueva versión estable):
+Pendiente de hacer:
 
-1.- Traducción de Catapult (el "frontend" externo de openMSX)
-2.- Traducción de los elementos restantes (dentro del ejecutable principal)
-3.- Traducción de los textos de ayuda de la consola 
-4.- Nuevo iconset/skin personalizado
-
-Se ha confirmado su compatibilidad con las versiones de openMSX:
-
-1.- Versión oficial compilada por Fixato/Vampier build 0.15.0-848-g4dbe0355f
-2.- Versión TSX Advanced (https://github.com/imulilla/openMSX_TSXadv/releases usad sólo hasta beta 002)
-3.- Compatible tanto en plataformas de 32 como 64 bits (los ficheros son los mismos)
+Todos los nuevos cambios los estoy añadiendo al GIT oficial o notificandolos para evitar confusiones
 
 
 ===========================================================================================================
                               COMO INSTALAR EL PARCHE DE MEJORA Y TRADUCCION
 ===========================================================================================================
 
-1.- Descarga exactamente estas versiones desarrollo (Beta 002 soporta las últimas):
+1.- Descarga exactamente estas versiones desarrollo (Beta 010 soporta las últimas):
 
-Si usas Windows x64 (una de estas dos) (Beta 004):
+Si usas Windows x64 (una de estas dos) (Beta 010):
 
 Version oficial:
 
-https://openmsx.fixato.net/builds/windows/x64/openmsx-0.15.0-794-gdbf6a10b6-windows-vc-x64-bin.zip
+https://openmsx.fixato.net/builds/windows/x64/openmsx-16.0-388-g003301ff7-windows-vc-x64-bin.zip
 
 Version TSX advanced (sólo hasta 002):
 
@@ -52,30 +47,26 @@ Si usas Windows x86 (una de estas dos):
 
 Version oficial:
 
-https://openmsx.fixato.net/builds/windows/x86/openmsx-0.15.0-794-gdbf6a10b6-windows-vc-x86-bin.zip
+https://openmsx.fixato.net/builds/windows/x86/openmsx-16.0-388-g003301ff7-windows-vc-x86-bin.zip
 
 Version TSX advanced:
 
 https://github.com/imulilla/openMSX_TSXadv/releases/download/c8cb602/openMSX_TSXadv_x86.zip
 
-2.- Descomprimid el zip correspondiente a vuestra version en el directorio ya instalado y sobreescribid:
+2.- Descomprimid el comprimido de esta traduccion en el directorio principal del openMSX y sobreescribid:
     
-    La versión "normal" es para la version oficial mencionada antes
-    La versión "tsxadv" es para la version TSX Advanced de imulilla
+3.- Ejecutar "openMSX.exe" para modo normal u "open.bat" para modo portable (se recomienda este último)
 
-3.- Ejecutar openMSX.exe
-
-4.- Si usas una build inferior al commit 23e23b2 usa la versión beta 001
+4.- Si usas una build inferior/inferior el script puede no funcionar bien (a veces hacen cambios cruciales)
 
 ===========================================================================================================
                                  LIMITACIONES Y ERRORES CONOCIDOS                                 
 ===========================================================================================================
 
 1.- Ayuda de consola en inglés (el código está en openMSX.exe se cambiará en la nueva versión estable)
-2.- Catapult no está traducido (con la salida de la nueva versión estable añadiré dicha traducción)
-3.- Algunos avisos del OSD están en inglés (openMSX.exe se cambiará en la nueva versión estable)
-4.- Algunas funciones no van o hacen cosas raras (borra la carpeta "openmsx" de "mis documentos")
-5.- En las fichas aparece "Author" en vez de autor (esto es porque está así escrito en el romdb de Vampier)
+2.- Algunos avisos del OSD están en inglés (openMSX.exe se cambiará en la nueva versión estable)
+3.- Algunas funciones no van o hacen cosas raras (borra la carpeta "openmsx" de "mis documentos")
+4.- En las fichas aparece "Author" en vez de autor (esto es porque está así escrito en el romdb de Vampier)
 
 
 ===========================================================================================================
@@ -156,3 +147,14 @@ BETA 007 Cambios en scripts para reflejar cambios nuevos y un pequeño fix que se
 BETA 008 Añadidos cambios para adaptarse a la última build (cambio de modo de mapeo de teclado) (11/08/2020)
 
 BETA 009 Añadidos cambios para adaptarse a la última build (25/09/2020)
+
+BETA 010 Fusionadas las dos versiones del script para TSX/TSXAdvanced y la oficial (11/03/2021)
+         Añadidos nuevo atajos de teclado con auditado de roms y extensiones
+         Cambiado el atajo del poke universal a uno mas accesible
+         Traducidos scripts TCL adicionales que no lo estaban antes
+         Traducidos todos los scripts del OSD para adaptarse a los nuevos cambios de openMSX
+         Añadido script para modo 100% portable
+         Ajustes y cambios en varios textos a otros mas familiares (Zocalo->Slot)
+         Eliminada la versión inglesa del README pues no tiene mucho sentido la verdad
+
+ 

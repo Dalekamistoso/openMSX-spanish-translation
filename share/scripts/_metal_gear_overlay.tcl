@@ -34,10 +34,10 @@ variable enemy_names [list \
 	"59" "5A" "5B" "5C" "5D" "5E" "5F" "60" "61" "62" "63" "64" "65" "66" ]
 
 set_help_text toggle_metal_gear_overlay \
-"Muestra OSD widgets que te ayudan a jugar al Metal Gear. Solo es util para
-este juego.. Si no es asi se te deformara la imagen con porquerias graficas
-Mayormente muestra las propiedades de Snake y los enemigos en pantalla asi 
-como los eventos."
+"Shows OSD widgets that help you play Metal Gear. Only useful if you
+are actually running this game... If you are not, you may get a lot of weird
+stuff on your screen :) It mostly shows Snake and enemy properties on screen
+and events that will happen."
 
 proc init {} {
 	variable num_enemies
@@ -167,10 +167,10 @@ proc toggle_metal_gear_overlay {} {
 	set metal_gear_overlay_active [expr {!$metal_gear_overlay_active}]
 	if {$metal_gear_overlay_active} {
 		init
-		set text "Overlay para Metal Gear activado"
+		set text "Overlay de Metal Gear activado"
 	} else {
 		osd destroy metal_gear
-		set text "Overlay para Metal Gear desactivado"
+		set text "Overlay de Metal Gear activado"
 	}
 	osd::display_message $text info
 	return $text

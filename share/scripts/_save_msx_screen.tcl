@@ -4,7 +4,7 @@ file. This file can for example be loaded in MSX-BASIC using the BLOAD command.
 
 This script was originally developed by NYYRIKKI, see also this forum thread:
 http://www.msx.org/forum/msx-talk/general-discussion/taking-sc5-snapshot-games
-} 
+}
 
 proc save_msx_screen {basename} {
 	# Gives an error in case of an invalid screen mode.
@@ -142,7 +142,7 @@ proc save_msx_screen {basename} {
 		}
 		close $out
 
-		append result "Pantalla volcada a $fname\n"
+		append result "Pantalla volcada en $fname\n"
 	}
 	return $result
 }

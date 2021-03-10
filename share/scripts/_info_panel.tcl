@@ -21,10 +21,10 @@ proc info_panel_init {} {
 
 	set panel_info [dict create \
 		software [dict create \
-			title "Software en ejecucion" width 400 row 0 \
+			title "Software actualmente en ejecucion" width 301 row 0 \
 			method guess_title] \
 		mapper [dict create \
-			title "Tipo de mapper" width 170 row 0 \
+			title "Tipo de mapeador (mapper)" width 269 row 0 \
 			method {set val ""; catch {set val [dict get [openmsx_info romtype [dict get [machine_info device [guess_rom_device]] "mappertype"]] description]}; set val}] \
 		fps [dict create \
 			title "FPS" width 38 row 1 \
@@ -42,10 +42,10 @@ proc info_panel_init {} {
 			title "Tiempo" width 60 row 1 \
 			method {utils::get_machine_time}] \
 		speed [dict create \
-			title "Velocidad" width 68 row 1 \
+			title "Velocidad" width 65 row 1 \
 			method {format "%d%%" [expr {round([get_actual_speed] * 100)}]}] \
 		machine [dict create \
-			title "Tipo y nombre de MSX" width 230 row 1 \
+			title "Nombre y tipo de MSX" width 237 row 1 \
 			method {
 				set name [utils::get_machine_display_name]
 				if {[catch {
