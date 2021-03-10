@@ -21,9 +21,7 @@ siguientes características:
 8.- Compatible tanto en plataformas de 32 como 64 bits (los ficheros son los mismos)
 9.- Añadido script para modo 100% portable en Windows
 
-Pendiente de hacer:
-
-Todos los nuevos cambios los estoy añadiendo al GIT oficial o notificandolos para evitar confusiones
+Todos los nuevos cambios propuestos o añadidos por mí en openMSX serán enviados al GIT oficial
 
 
 ===========================================================================================================
@@ -32,32 +30,21 @@ Todos los nuevos cambios los estoy añadiendo al GIT oficial o notificandolos par
 
 1.- Descarga exactamente estas versiones desarrollo (Beta 010 soporta las últimas):
 
-Si usas Windows x64 (una de estas dos) (Beta 010):
+Si usas la versión oficial de Windows x86/x64 (Beta 010):
 
-Version oficial:
+Version oficial (confirmada que funciona las siguientes a dia 11):
 
 https://openmsx.fixato.net/builds/windows/x64/openmsx-16.0-388-g003301ff7-windows-vc-x64-bin.zip
-
-Version TSX advanced (sólo hasta 002):
-
-https://github.com/imulilla/openMSX_TSXadv/releases/download/c8cb602/openMSX_TSXadv_x64.zip
-
-
-Si usas Windows x86 (una de estas dos):
-
-Version oficial:
-
 https://openmsx.fixato.net/builds/windows/x86/openmsx-16.0-388-g003301ff7-windows-vc-x86-bin.zip
 
-Version TSX advanced:
+Version TSX advanced (las traducciones van actualizadas contra sus versiones normalmente):
 
-https://github.com/imulilla/openMSX_TSXadv/releases/download/c8cb602/openMSX_TSXadv_x86.zip
+https://github.com/imulilla/openMSX_TSXadv/releases/
 
 2.- Descomprimid el comprimido de esta traduccion en el directorio principal del openMSX y sobreescribid:
     
 3.- Ejecutar "openMSX.exe" para modo normal u "open.bat" para modo portable (se recomienda este último)
 
-4.- Si usas una build inferior/inferior el script puede no funcionar bien (a veces hacen cambios cruciales)
 
 ===========================================================================================================
                                  LIMITACIONES Y ERRORES CONOCIDOS                                 
@@ -67,6 +54,7 @@ https://github.com/imulilla/openMSX_TSXadv/releases/download/c8cb602/openMSX_TSX
 2.- Algunos avisos del OSD están en inglés (openMSX.exe se cambiará en la nueva versión estable)
 3.- Algunas funciones no van o hacen cosas raras (borra la carpeta "openmsx" de "mis documentos")
 4.- En las fichas aparece "Author" en vez de autor (esto es porque está así escrito en el romdb de Vampier)
+5.- Si usas una build inferior/superior el script puede no funcionar bien (a veces hacen cambios cruciales)
 
 
 ===========================================================================================================
