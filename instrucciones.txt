@@ -145,4 +145,4 @@ BETA 010 Fusionadas las dos versiones del script para TSX/TSXAdvanced y la ofici
          Ajustes y cambios en varios textos a otros mas familiares (Zocalo->Slot)
          Eliminada la versión inglesa del README pues no tiene mucho sentido la verdad
 
- 
+BETA 011 Solucionado un problema que impedia el correcto cambio de HD/SD (19/03/2021)
