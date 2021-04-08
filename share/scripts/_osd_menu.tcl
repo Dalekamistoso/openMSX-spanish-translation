@@ -1062,7 +1062,7 @@ proc create_hardware_menu {} {
 			 actions { A { osd_menu::menu_create $osd_menu::extensions_menu }}}
 	lappend items { text "Conectores y puertos"
 			 actions { A { osd_menu::menu_create [osd_menu::menu_create_connectors_list] }}}
-	if {![catch {openmsx_info setting firmwareswitch}]} {
+    if {![catch {set ::firmwareswitch}]} {
 		lappend items { textexpr "Firmware interno activo: [osd_menu::boolean_to_text $::firmwareswitch]"
 			actions { LEFT  { osd_menu::menu_setting [cycle_back firmwareswitch] }
 			          RIGHT { osd_menu::menu_setting [cycle      firmwareswitch] }}}
@@ -1921,7 +1921,7 @@ proc menu_select_hdd {drive item} {
 
 proc confirm_change_hdd {item result} {
 	menu_close_top
-	if {$result eq "Yes"} {
+	if {$result eq "Si"} {
 		set fullname [file join $::osd_hdd_path [lindex $item 0]]
 		if {[catch {set ::power off; [lindex $item 1] $fullname} errorText]} {
 			osd::display_message "Imposible cambiar imagen de HDD: $errorText" error

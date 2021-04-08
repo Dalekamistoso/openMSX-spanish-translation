@@ -80,13 +80,22 @@ if {$tcl_platform(os) eq "Darwin"} { ;# Mac
 unset my_type_command
 
 # POKE UNIVERSAL
-bind_default ALT+F11 "type_from_file poke.txt"
+bind_default ALT+SHIFT+F11 "type_from_file poke.txt"
 
 # MENU PARA TECLADOS SIN TECLA MENU
-bind_default ALT+F12 main_menu_toggle
+bind_default ALT+SHIFT+F12 main_menu_toggle
 
 # TEST DE MAQUINAS PRESENTES
 bind_default ALT+SHIFT+F1 test_all_machines
 
 # TEST DE EXTENSIONES PRESENTES
 bind_default ALT+SHIFT+F2 test_all_extensions 
+
+# RESET RAPIDO
+bind_default ALT+SHIFT+F3 reset
+
+# CAMBIAR DE FUENTE DE VIDEO (GFX9000/VDP)
+bind_default ALT+SHIFT+F6 cycle videosource
+
+# CAMBIAR DE MSX ACTIVO (MULTIPLES PESTAÑAS)
+bind_default ALT+SHIFT+F7 cycle_machine
