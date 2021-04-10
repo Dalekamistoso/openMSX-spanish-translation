@@ -168,3 +168,5 @@ BETA 012 Implementado fix para el error descrito en https://github.com/openMSX/o
          Añadido atajo para conmutar entre múltiples fuentes de video (GFX9000/VDP)
          Añadido atajo para conmutar entre MSX activos
          Retoques en el fichero de instrucciones
+		 
+BETA 013 Agregado commit d603f25 (10/04/2021)		 
