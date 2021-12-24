@@ -25,6 +25,9 @@ variable input_buffer ""
 variable input_last_time [openmsx_info realtime]
 variable input_timeout 1; #sec
 
+variable controller_capture_timeout 5; #sec
+variable controller_capture_after_id ""
+
 variable pool_prefix "pool::"
 
 proc push_menu_info {} {
@@ -646,7 +649,7 @@ proc get_io_extensions {} {
 variable mediaslot_info [dict create \
 "rom"      [dict create mediabasecommand "cart"           mediapath "::osd_rom_path"  listtype "rom"  itemtext "Slot de cartucho"    shortmediaslotname "slot"  longmediaslotname "slot de cartucho"]\
 "disk"     [dict create mediabasecommand "disk"           mediapath "::osd_disk_path" listtype "disk" itemtext "Disquetera" shortmediaslotname "drive" longmediaslotname "unidad de disco"]\
-#"cassette" [dict create mediabasecommand "cassetteplayer" mediapath "::osd_tape_path" listtype "tape" itemtext "Tape Deck"    shortmediaslotname "xxx"   longmediaslotname "cassette player"]\
+#"cassette" [dict create mediabasecommand "cassetteplayer" mediapath "::osd_tape_path" listtype "tape" itemtext "Casete"    shortmediaslotname "xxx"   longmediaslotname "unidad de cinta"]\
 ]
 
 proc create_slot_actions_to_select_file {slot path listtype} {
@@ -802,7 +805,7 @@ proc create_main_menu {} {
 	         actions { A { osd_menu::menu_create [osd_menu::create_hardware_menu] }}
 	         post-spacing 3 }
 	lappend items { text "Ajustes de velocidad y otros"
-	         actions { A { osd_menu::menu_create $osd_menu::misc_setting_menu }}}
+	         actions { A { osd_menu::menu_create [osd_menu::create_misc_setting_menu] }}}
 	lappend items { text "Ajustes de sonido"
 	         actions { A { osd_menu::menu_create $osd_menu::sound_setting_menu }}}
 	lappend items { text "Ajustes de imagen"
@@ -819,13 +822,15 @@ proc create_main_menu {} {
 	return $menu_def
 }
 
-set misc_setting_menu {
-	font-size 8
-	border-size 2
-	width 160
-	xpos 100
-	ypos 120
-	items {{ text "Ajustes de velocidad y otros"
+proc create_misc_setting_menu {} {
+	set menu_def {
+		font-size 8
+		border-size 2
+		width 160
+		xpos 100
+		ypos 120
+	}
+	set items {{ text "Ajustes de velocidad y otros"
 	         font-size 10
 	         post-spacing 6
 	         selectable false }
@@ -844,8 +849,209 @@ set misc_setting_menu {
 	       { textexpr "Conjunto de iconos del OSD: $osd_leds_set"
 	         actions { LEFT  { osd_menu::menu_setting [cycle_back osd_leds_set] }
 	                   RIGHT { osd_menu::menu_setting [cycle      osd_leds_set] }}}
-              }}
+              }
+	if {[info exists ::joystick1_config]} {
+		lappend items { text "Mapeo de host a controlador MSX.."
+	                        actions { A { osd_menu::menu_create_controller_mapping }}}
+	}
 
+	dict set menu_def items $items
+	return $menu_def
+}
+
+proc menu_create_controller_mapping {} {
+	set joysticks [info global joystick?_config]
+	if {[llength $joysticks] == 1} {
+		menu_controller_mapping_exec [lindex $joysticks 0]
+	} else {
+		set menu_def {
+			 execute menu_controller_mapping_exec
+			 font-size 8
+			 border-size 2
+			 width 200
+			 xpos 110
+			 ypos 130
+			 header { text "Escoge controlador host a configurar"
+				  font-size 10
+				  post-spacing 6 }}
+
+		set presentation [list]
+		foreach i $joysticks {
+			set joystick [lindex [split $i _] 0]
+			lappend presentation [formato "%s: %s" $joystick [machine_info pluggable $joystick]]
+		}
+		lappend menu_def presentation $presentation
+
+		osd_menu::menu_create [prepare_menu_list $joysticks 5 $menu_def]
+	}
+}
+
+proc menu_controller_mapping_exec {config_item} {
+	set menu_def [list \
+		 execute "menu_controller_button_mapping_exec $config_item"\
+		 font-size 8 \
+		 border-size 2 \
+		 width 170 \
+		 xpos 115 \
+		 ypos 135 \
+		 header [list text "Escoge entrada MSX a configurar" \
+			  font-size 10 \
+			  post-spacing 6] ]
+
+	set items [dict keys [set ::$config_item]]
+	foreach i $items {
+		set prefix [expr {([string length $i] == 1) ? "Trigger" : "Direction"}]
+		set mapping [dict get [set ::$config_item] $i]
+		if {[llength $mapping] == 0} {
+			set mapping "(Not mapped.)"
+		}
+		lappend presentation [format "%s %s: %s" $prefix $i $mapping]
+	}
+	lappend menu_def presentation $presentation
+
+	osd_menu::menu_create [prepare_menu_list $items [llength $items] $menu_def]
+}
+
+proc menu_controller_button_mapping_exec {config_item button} {
+	set menu_def [list \
+		 execute "menu_controller_button_mapping_add_remove_exec $config_item $button"\
+		 font-size 8 \
+		 border-size 2 \
+		 width 170 \
+		 xpos 120 \
+		 ypos 140 \
+		 header [list text "Escoge opción para entrada MSX $button" \
+			  font-size 10 \
+			  post-spacing 6] ]
+
+	set items [list "add"]
+	set presentation [list "Add new mapping"]
+	set mappings [dict get [set ::$config_item] $button]
+	foreach mapping $mappings {
+		lappend items $mapping
+		lappend presentation [format "Remove %s mapping" $mapping]
+	}
+	lappend menu_def presentation $presentation
+
+	osd_menu::menu_create [prepare_menu_list $items 5 $menu_def]
+}
+
+proc menu_controller_button_mapping_add_exec {config_item button} {
+	# capture something
+	set event [string map {"stick" "" "_config" ""} $config_item]
+	if {[string length $button] == 1} {
+		#trigger
+		set subevents [list "button"]
+	} else {
+		set subevents [list "axis" "hat"]
+	}
+	# It would sound more logical to use after, instead of bind,
+	# but then we cannot block the input for the menu itself.
+	foreach se $subevents {
+		# execute the bind command in a new stack frame,
+		# because openMSX may send a joystick event directly
+		# after having executed this script (OSDControl event
+		# may have caused this script to be called) and that
+		# would then be directly captured.
+		set bind_cmd [list bind -layer capture "$event $se" -event [list osd_menu::joy_event_capture $event $button $config_item]]
+		after realtime 0 $bind_cmd
+	}
+	activate_input_layer -blocking capture
+	variable controller_capture_timeout
+	message "Press button on host controller to map to MSX button $button within $controller_capture_timeout seconds..."
+	variable controller_capture_after_id
+	# the escaping and expansion is a bit tricky, so let's go pedantic here
+	set cmd1 [list message "Timed out... canceling!"]
+	set cmd2 [list osd_menu::cancel_capture]
+	set cmds "$cmd1;$cmd2"
+	set controller_capture_after_id [after realtime $controller_capture_timeout $cmds]
+}
+
+proc menu_controller_button_mapping_remove_exec {config_item button target} {
+	set config [dict get [set ::$config_item] $button]
+	set idx [lsearch $config $target]
+	dict set ::$config_item $button [lreplace $config $idx $idx]
+	message "Removed mapping for $button: $target"
+	# recreate previous menu, to refresh the presentation
+	menu_close_top
+	menu_close_top
+	menu_controller_mapping_exec $config_item
+}
+
+proc menu_controller_button_mapping_add_remove_exec {config_item button target} {
+	if {$target eq "add"} {
+		menu_controller_button_mapping_add_exec $config_item $button
+	} else {
+		menu_controller_button_mapping_remove_exec $config_item $button $target
+	}
+}
+
+proc cancel_capture {} {
+	unbind -layer capture
+	deactivate_input_layer capture
+}
+
+proc joy_event_capture { bound_host_input msx_input config_item captured_event } {
+	# parse event
+	set value ""
+	lassign [split $captured_event] joy part1 part2
+	# there could also be events from other host controllers, ignore these
+	if {$joy ne $bound_host_input} return
+
+	if {[string match "hat*" $part1]} {
+		# directions LEFT RIGHT UP DOWN:
+		#  hatN left -> L_hatN
+		#  hatN right -> R_hatN
+		#  hatN up -> U_hatN
+		#  hatN down -> D_hatN
+
+		# silently ignore 'center' events
+		if {$part2 eq "center"} return
+
+		set value "[string toupper [string range $part2 0 0]]_$part1"
+	} elseif {[string match "axis*" $part1]} {
+		# directions LEFT RIGHT UP DOWN:
+		#  axisN <negval> -> -axisN
+		#  axisN <posval> -> +axisN
+
+		# silently ignore neutral axis events
+		if {$part2 == 0} return
+
+		if {$part2 < 0} {
+			set value "-$part1"
+		} else {
+			set value "+$part1"
+		}
+	} elseif {[string match "button*" $part1]} {
+		# triggers A B:
+		# buttonN down -> buttonN
+
+		# silently ignore other events than down-events
+		if {$part2 ne "down"} return
+
+		set value $part1
+	} else {
+		message "DEBUG: Don't know how to bind unexpected event $captured_event"
+		return
+	}
+
+	# if we get here, we can stop capturing
+	cancel_capture
+	variable controller_capture_after_id
+	after cancel $controller_capture_after_id
+
+	# avoid double entries in the mapping
+	set config [dict get [set ::$config_item] $msx_input]
+	if {$value ni $config} {
+		message "Added mapping for $msx_input: $value"
+		dict lappend ::$config_item $msx_input $value
+	}
+
+	# recreate previous menu, to refresh the presentation
+	menu_close_top
+	menu_close_top
+	menu_controller_mapping_exec $config_item
+}
 set resampler_desc [dict create fast "Rapido (Baja calidad)" blip "Medio (equilibrado)" hq "HQ (Mejor calidad/lento)"]
 
 set sound_setting_menu {
@@ -1278,7 +1484,7 @@ proc menu_create_load_machine_list {{mode "replace"}} {
 
 proc menu_load_machine_exec_replace {item} {
 	if {[catch {machine $item} errorText]} {
-		osd::display_message $errorText error
+		message $errorText error
 	} else {
 		menu_close_all
 	}
@@ -1289,7 +1495,7 @@ proc menu_load_machine_exec_add {item} {
 	set err [catch {${id}::load_machine $item} error_result]
 	if {$err} {
 		delete_machine $id
-		osd::display_message "Error iniciando [utils::get_machine_display_name_by_config_name $item]: $error_result" error
+		message "Error iniciando [utils::get_machine_display_name_by_config_name $item]: $error_result" error
 	} else {
 		menu_close_top
 		activate_machine $id
@@ -1338,10 +1544,10 @@ proc menu_add_extension_exec {slot item} {
 	}
 	set ext [string index $slot end]
 	if {[catch {if {$slot ne ""} { cart${ext} eject }; set extname [ext${ext} $item]} errorText]} {
-		osd::display_message $errorText error
+		message $errorText error
 	} else {
 		menu_close_all
-		osd::display_message "Extension [get_extension_display_name $extname] insertada en [get_extension_slot_description $extname]!"
+		message "Extension [get_extension_display_name $extname] insertada en [get_extension_slot_description $extname]!"
 	}
 }
 
@@ -1371,7 +1577,7 @@ proc menu_create_plugged_extensions_list {} {
 
 proc menu_remove_extension_exec {item} {
 	menu_close_all
-	osd::display_message "Expansion [get_extension_display_name $item] retirada de [get_extension_slot_description $item]!"
+	message "Expansion [get_extension_display_name $item] retirada de [get_extension_slot_description $item]!"
 	remove_extension $item
 }
 
@@ -1467,7 +1673,7 @@ proc menu_plug_exec {connector pluggable} {
 	}
 	#note: NO braces around $command
 	if {[catch $command errorText]} {
-		osd::display_message $errorText error
+		message $errorText error
 	} else {
 		menu_close_top
 		# refresh the connectors menu
@@ -1517,7 +1723,7 @@ proc ls {directory extensions} {
 		set dirs [glob -nocomplain -tails -directory $directory -types {d r x} *]
 		set specialdir [glob -nocomplain -tails -directory $directory -types {hidden d} ".openMSX"]
 	} errorText]} {
-		osd::display_message "Incapaz de leer dir $directory: $errorText" error
+		message "Incapaz de leer dir $directory: $errorText" error
 	}
 	set dirs2 [list]
 	foreach dir [concat $dirs $specialdir] {
@@ -1619,7 +1825,7 @@ proc menu_create_rom_list {path slot} {
 proc menu_select_rom {slot item {open_main false}} {
 	if {$item eq "--eject--"} {
 		menu_close_all
-		osd::display_message "Cartucho [get_slot_content $slot] quitado del slot [get_slot_str $slot]!"
+		message "Cartucho [get_slot_content $slot] quitado del slot [get_slot_str $slot]!"
 		$slot eject
 		reset
 	} elseif {$item eq "--extension--"} {
@@ -1648,7 +1854,7 @@ proc menu_select_rom {slot item {open_main false}} {
 
 proc menu_rom_with_mappertype_exec {slot fullname mappertype} {
 	if {[catch {$slot $fullname -romtype $mappertype} errorText]} {
-		osd::display_message "No puedo insertar ROM: $errorText" error
+		message "No puedo insertar ROM: $errorText" error
 	} else {
 		menu_close_all
 
@@ -1698,7 +1904,7 @@ proc menu_rom_with_mappertype_exec {slot fullname mappertype} {
 				append message2 "$mappertype\n"
 			}
 		}
-		osd::display_message $message1
+		message $message1
 
 		set txt_size 6
 		set xpos 35
@@ -1709,7 +1915,7 @@ proc menu_rom_with_mappertype_exec {slot fullname mappertype} {
 			set xpos 53
 		}
 
-		# TODO: this code knows the internal name of the widget of osd::display_message proc... it shouldn't need to.
+		# TODO: this code knows the internal name of the widget of message proc... it shouldn't need to.
 		osd create text osd_display_message.rominfo_text -x $xpos -y 2 -size $txt_size -rgba 0xffffffff -text "$message2"
 		reset
 	}
@@ -1782,7 +1988,7 @@ proc menu_select_disk {drive item {dummy false}} {
 		set cur_image [get_slot_content $drive]
 		menu_close_all
 		$drive eject
-		osd::display_message "Disco $cur_image expulsado de la unidad [get_slot_str $drive]!"
+		message "Disco $cur_image expulsado de la unidad [get_slot_str $drive]!"
 	} else {
 		set is_pool_item false
 		variable pool_prefix
@@ -1805,11 +2011,11 @@ proc menu_select_disk {drive item {dummy false}} {
 			menu_create [menu_create_disk_list $::osd_disk_path $drive]
 		} else {
 			if {[catch {$drive $fullname} errorText]} {
-				osd::display_message "Imposible insertar disco: $errorText" error
+				message "Imposible insertar disco: $errorText" error
 			} else {
 				menu_close_all
 				if {$item eq "."} { set item $fullname }
-				osd::display_message "Disco $item insertado en unidad [get_slot_str $drive]!"
+				message "Disco $item insertado en unidad [get_slot_str $drive]!"
 			}
 		}
 	}
@@ -1858,13 +2064,13 @@ proc menu_select_tape {item} {
 	variable taperecordings_directory
 	if {$item eq "--create--"} {
 		menu_close_all
-		osd::display_message [cassetteplayer new [menu_free_tape_name]]
+		message [cassetteplayer new [menu_free_tape_name]]
 	} elseif {$item eq "--eject--"} {
 		menu_close_all
-		osd::display_message [cassetteplayer eject]
+		message [cassetteplayer eject]
 	} elseif {$item eq "--rewind--"} {
 		menu_close_all
-		osd::display_message [cassetteplayer rewind]
+		message [cassetteplayer rewind]
 	} else {
 		set fullname [file join $::osd_tape_path $item]
 		if {[file isdirectory $fullname]} {
@@ -1873,9 +2079,9 @@ proc menu_select_tape {item} {
 			menu_create [menu_create_tape_list $::osd_tape_path]
 		} else {
 			if {[catch {cassetteplayer $fullname} errorText]} {
-				osd::display_message "Imposible insertar cinta: $errorText" error
+				message "Imposible insertar cinta: $errorText" error
 			} else {
-				osd::display_message "Cinta insertada $item!"
+				message "Cinta insertada $item!"
 				menu_close_all
 			}
 		}
@@ -1928,10 +2134,10 @@ proc confirm_change_hdd {item result} {
 	if {$result eq "Si"} {
 		set fullname [file join $::osd_hdd_path [lindex $item 0]]
 		if {[catch {set ::power off; [lindex $item 1] $fullname} errorText]} {
-			osd::display_message "Imposible cambiar imagen de HDD: $errorText" error
+			message "Imposible cambiar imagen de HDD: $errorText" error
 			# TODO: we already powered off even though the file may be invalid... save state first?
 		} else {
-			osd::display_message "Cambiada imagen de HDD a [lindex $item 0]!"
+			message "Cambiada imagen de HDD a [lindex $item 0]!"
 			menu_close_all
 		}
 		set ::power on
@@ -1969,7 +2175,7 @@ proc menu_select_ld {item} {
 		menu_close_all
 		set cur_image [get_slot_content laserdiscplayer]
 		laserdiscplayer eject
-		osd::display_message "LaserDisc $cur_image expulsado!"
+		message "LaserDisc $cur_image expulsado!"
 	} else {
 		set fullname [file join $::osd_ld_path $item]
 		if {[file isdirectory $fullname]} {
@@ -1978,9 +2184,9 @@ proc menu_select_ld {item} {
 			menu_create [menu_create_ld_list $::osd_ld_path]
 		} else {
 			if {[catch {laserdiscplayer insert $fullname} errorText]} {
-				osd::display_message "Imposible cargar LaserDisc: $errorText" error
+				message "Imposible cargar LaserDisc: $errorText" error
 			} else {
-				osd::display_message "Cargado Laserdisc $item!"
+				message "Cargado Laserdisc $item!"
 				menu_close_all
 			}
 		}
@@ -2053,7 +2259,7 @@ proc menu_loadstate_deselect {item} {
 
 proc menu_loadstate_exec {item} {
 	if {[catch {loadstate $item} errorText]} {
-		osd::display_message $errorText error
+		message $errorText error
 	} else {
 		menu_close_all
 	}
@@ -2073,9 +2279,9 @@ proc confirm_save_state {item result} {
 	menu_close_top
 	if {$result eq "Si"} {
 		if {[catch {savestate $item} errorText]} {
-			osd::display_message $errorText error
+			message $errorText error
 		} else {
-			osd::display_message "Estado guardado en $item!"
+			message "Estado guardado en $item!"
 			menu_close_all
 		}
 	}
@@ -2110,7 +2316,7 @@ proc confirm_action {text action item} {
 
 proc menu_loadreplay_exec {item} {
 	if {[catch {reverse loadreplay $item} errorText]} {
-		osd::display_message $errorText error
+		message $errorText error
 	} else {
 		menu_close_all
 	}
@@ -2118,7 +2324,7 @@ proc menu_loadreplay_exec {item} {
 
 proc menu_loadscript_exec {item} {
 	if {[catch {source $item} errorText]} {
-		osd::display_message $errorText error
+		message $errorText error
 	}
 }
 
@@ -2144,7 +2350,7 @@ proc drop_handler { event } {
 		set mediabasecommand [dict get $mediaslot_info $category mediabasecommand]
 		set slots [lsort [info command ${mediabasecommand}?]]
 		if {[llength $slots] == 0} {
-			osd::display_message "Incapaz de manejar $filetext $filename, no hay $longmediaslotname presente" error
+			message "Incapaz de manejar $filetext $filename, no hay $longmediaslotname presente" error
 		} elseif {[llength $slots] > 1} {
 			set path $filename
 			set menutitle "Escoge ${longmediaslotname}"
@@ -2157,11 +2363,11 @@ proc drop_handler { event } {
 		if {[info command laserdiscplayer] ne ""} {; # only exists on some Pioneers
 			osd_menu::menu_select_ld $filename
 		} else {
-			osd::display_message "Incapaz de manejar $filetext $filename, no hay lector Laserdisc." error
+			message "Incapaz de manejar $filetext $filename, no hay lector Laserdisc." error
 		}
 	} elseif {$category eq "cassette"} {
 		if {[catch "machine_info connector cassetteport"]} {; # example: turboR
-			osd::display_message "Incapaz de manejar $filetext $filename, no hay puerto de casete." error
+			message "Incapaz de manejar $filetext $filename, no hay puerto de casete." error
 		} else {
 			osd_menu::menu_select_tape $filename
 		}
@@ -2176,7 +2382,7 @@ proc drop_handler { event } {
 		if {[file extension $filename] eq ".txt"} {
 			type_from_file $filename
 		} else {
-			osd::display_message "No se como manejar $filetext $filename..." error
+			message "No se como manejar $filetext $filename..." error
 		}
 	}
 }
