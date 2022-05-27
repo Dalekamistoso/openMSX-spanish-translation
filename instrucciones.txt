@@ -176,3 +176,5 @@ BETA 014 Agregado fix ba933dd (01/06/2021)
 BETA 015 Actualizado con soporte para 17.0-239-g94ec523a1 (24/12/21)
 
 BETA 016 Actualizado con soporte para 17.0-353-g0d1a353b1 (14/04/22)
+
+BETA 017 Actualizado con soporte para 18.0 RC1 (27/05/22)
