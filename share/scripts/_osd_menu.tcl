@@ -1453,7 +1453,7 @@ proc menu_create_load_machine_list {{mode "replace"}} {
 	         execute $proc_to_exec \
 	         font-size 8 \
 	         border-size 2 \
-	         width 200 \
+	         width 210 \
 	         xpos 110 \
 	         ypos 130 \
 	         header { text "Escoge maquina a ejecutar"
@@ -1467,7 +1467,11 @@ proc menu_create_load_machine_list {{mode "replace"}} {
 		if {$i eq $::default_machine} {
 			set extra_info " (predeterminado)"
 		}
-		lappend presentation "[utils::get_machine_display_name_by_config_name $i]$extra_info"
+		set type_info "???"
+		catch {
+			set type_info [dict get [openmsx_info machines $i] type]
+		}
+		lappend presentation "[utils::get_machine_display_name_by_config_name $i], $type_info$extra_info"
 	}
 
 	set items_sorted [list]
