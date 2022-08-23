@@ -770,8 +770,21 @@ proc create_main_menu {} {
 	}
 	lappend items { textexpr "openMSX traducido por DrWh0"
 	         font-size 10
-	         post-spacing 6
+	         post-spacing 1
 	         selectable false }
+	set machine_name [utils::get_machine_display_name]
+	if {[catch {
+		set type [dict get [openmsx_info machines [machine_info config_name]] type]
+		set machine_display [format "%s (%s)" $machine_name $type]
+	}]} {
+		set machine_display $machine_name
+	}
+	lappend items [list text "MSX: $machine_display" \
+	         font-size 5 \
+	         post-spacing 5 \
+			 text-color 0x00F00FFF \
+	         selectable false ]
+
 	lappend items {*}[create_media_menu_items "rom"]
 	lappend items {*}[create_media_menu_items "disk"]
 	if {[info command hda] ne ""} {; # only exists when hard disk extension available
@@ -814,8 +827,10 @@ proc create_main_menu {} {
 	lappend items { text "Funciones avanzadas"
 	         actions { A { osd_menu::menu_create $osd_menu::advanced_menu }}
 	         post-spacing 10 }
-	lappend items { text "Reiniciar maquina activa"
-	         actions { A { reset; osd_menu::menu_close_all }}}
+	if {[info command reset] ne ""} {; # only do this when there's a reset command (machine loaded)
+			lappend items { text "Reiniciar maquina activa"
+			actions { A { reset; osd_menu::menu_close_all }}}
+	}
 	lappend items { text "Salir de openMSX"
 	         actions { A quitmenu::quit_menu }}
 	dict set menu_def items $items
@@ -1266,12 +1281,14 @@ proc create_hardware_menu {} {
 			 selectable false }
 	lappend items { text "Cambiar de MSX..."
 			 actions { A { osd_menu::menu_create [osd_menu::menu_create_load_machine_list]; catch { osd_menu::select_menu_item [machine_info config_name]} }}}
-	lappend items { text "Establecer como MSX por defecto"
-			 actions { A { set ::default_machine [machine_info config_name]; osd_menu::menu_close_top }}}
-	lappend items { text "Expansiones"
-			 actions { A { osd_menu::menu_create $osd_menu::extensions_menu }}}
-	lappend items { text "Conectores y puertos"
-			 actions { A { osd_menu::menu_create [osd_menu::menu_create_connectors_list] }}}
+	if {[info command machine_info] ne ""} {; # only do this when there's an actual machine loaded
+			lappend items { text "Guardar como MSX por defecto"
+							 actions { A { set ::default_machine [machine_info config_name]; osd_menu::menu_close_top }}}
+			lappend items { text "Expansiones.."					 
+							 actions { A { osd_menu::menu_create $osd_menu::extensions_menu }}}
+			lappend items { text "Conectores y puertos"	
+							 actions { A { osd_menu::menu_create [osd_menu::menu_create_connectors_list] }}}
+	}
     if {![catch {set ::firmwareswitch}]} {
 		lappend items { textexpr "Firmware interno activo: [osd_menu::boolean_to_text $::firmwareswitch]"
 			actions { LEFT  { osd_menu::menu_setting [cycle_back firmwareswitch] }
