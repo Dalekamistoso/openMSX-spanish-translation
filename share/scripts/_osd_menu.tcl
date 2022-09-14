@@ -1480,15 +1480,25 @@ proc menu_create_load_machine_list {{mode "replace"}} {
 	set items [get_filtered_configs machines]
 
 	foreach i $items {
-		set extra_info ""
+		set default_info ""
 		if {$i eq $::default_machine} {
-			set extra_info " (predeterminado)"
+			set default_info " \[por defecto\]"
 		}
-		set type_info "???"
+		set type "???"
+		set region ""
+		set extra_info ""
 		catch {
-			set type_info [dict get [openmsx_info machines $i] type]
+			set type [dict get [openmsx_info machines $i] type]
 		}
-		lappend presentation "[utils::get_machine_display_name_by_config_name $i], $type_info$extra_info"
+		catch {
+			set region [dict get [openmsx_info machines $i] region]
+		}
+		if {$region eq ""} {
+			set extra_info $type
+		} else {
+			set extra_info "$type ([string toupper $region])"
+		}
+		lappend presentation "[utils::get_machine_display_name_by_config_name $i], $extra_info$default_info"
 	}
 
 	set items_sorted [list]
