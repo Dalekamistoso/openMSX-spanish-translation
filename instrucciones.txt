@@ -186,3 +186,5 @@ BETA 018 Actualizado con soporte git (23/08/22)
 BETA 019 Actualizado con soporte git (14/09/22)
          Mejoras en presentación de máquina activa
          Ajustado texto de MSX predeterminado en lista de máquinas
+
+BETA 020 Actualizado con soporte git (26/10/22)
