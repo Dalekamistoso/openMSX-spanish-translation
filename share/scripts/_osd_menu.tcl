@@ -56,6 +56,7 @@ proc set_scrollidx {value} {
 	peek_menu_info
 	dict set menuinfo scrollidx $value
 }
+
 proc get_current_menu_name {} {
 	peek_menu_info
 	return [dict get $menuinfo name]
@@ -110,7 +111,11 @@ proc menu_create {menudef} {
 					-rgba $textcolor -x $bordersize -y $y
 		if {$selectable} {
 			set allactions [concat $defactions $actions]
-			lappend selectinfo [list $y $fontsize $allactions $on_select $on_deselect]
+			# NOTE: the 1.5 below is necessary to place the select
+			# bar properly vertically... It's unclear why this is
+			# necessary and why this emperically determined value
+			# is working.
+			lappend selectinfo [list [expr $y+1.5] $fontsize $allactions $on_select $on_deselect]
 		}
 		incr y $fontsize
 		incr y [get_optional itemdef "post-spacing" 0]
@@ -207,7 +212,6 @@ proc menu_close_all {} {
 		menu_close_top
 	}
 }
-
 
 proc menu_close_until {name} {
 	variable menulevels
@@ -373,6 +377,11 @@ user_setting create string osd_ld_path "OSD LD Load Menu Last Known Path" $env(H
 if {![file exists $::osd_rom_path] || ![file readable $::osd_rom_path]} {
 	# revert to default (should always exist)
 	unset ::osd_rom_path
+}
+
+if {![file exists $::osd_rom_patch_path] || ![file readable $::osd_rom_patch_path]} {
+	# revert to default (should always exist)
+	unset ::osd_rom_patch_path
 }
 
 if {![file exists $::osd_disk_path] || ![file readable $::osd_disk_path]} {
@@ -1861,6 +1870,7 @@ proc menu_create_rom_list {path slot} {
 	set presentation [list]
 	if {[lindex [$slot] 2] ne "empty"} {
 		lappend items "--eject--"
+		lappend presentation "\[Eject [get_slot_content $slot]\]"
 		set media_info [machine_info media $slot]
 		if {[dict get $media_info type] eq "rom"} {
 			lappend items "--patches--"

@@ -188,3 +188,5 @@ BETA 019 Actualizado con soporte git (14/09/22)
          Ajustado texto de MSX predeterminado en lista de máquinas
 
 BETA 020 Actualizado con soporte git (26/10/22)
+
+BETA 021 Arreglados algunos errores en _osd_menu.tcl (13/11/22)
